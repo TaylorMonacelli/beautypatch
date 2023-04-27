@@ -16,9 +16,27 @@ func main() {
 		"C:\\Windows\\explorer.exe",
 	}
 
+	// Create the log file directory if it doesn't exist
+	logFilePath := "C:\\ProgramData\\Streambox\\Beautypatch\\log\\run.log"
+	logDirPath := filepath.Dir(logFilePath)
+	if _, err := os.Stat(logDirPath); os.IsNotExist(err) {
+		err := os.MkdirAll(logDirPath, os.ModePerm)
+		if err != nil {
+			logrus.Fatalf("Failed to create log directory: %v", err)
+		}
+	}
+
 	// Initialize logrus
+	// Create the logger and set the output to the log file
 	logger := logrus.New()
-	logger.SetOutput(os.Stdout)
+	logFile, err := os.OpenFile(logFilePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
+	if err != nil {
+		logrus.Fatalf("Failed to open log file: %v", err)
+	}
+	logger.SetOutput(logFile)
+
+	// Log a message
+	logger.Info("Logging to file and stdout")
 
 	xmlTemplate := `<?xml version="1.0" encoding="utf-8"?>
 <LayoutModificationTemplate
