@@ -11,6 +11,7 @@ func main() {
 	paths := []string{
 		"C:\\Windows\\System32\\control.exe",
 		"C:\\Windows\\System32\\windowspowershell\\v1.0\\powershell.exe",
+		"C:\\Windows\\System32\\windowspowershell\\v1.0\\powershell.exe.lnk",
 		"C:\\Windows\\explorer.exe",
 	}
 
