@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"time"
 
@@ -83,16 +84,23 @@ func main() {
 
 	xmlContent := []byte(fmt.Sprintf(xmlTemplate, taskbarApps))
 
-	// Write to file
-	wd, err := os.Getwd()
+	configDir, err := os.UserConfigDir()
 	if err != nil {
-		fmt.Println("Error getting working directory:", err)
-		return
+		panic(err)
 	}
 
-	xmlPath := filepath.Join(wd, "Taskbar.xml")
+	filename := "Taskbar.xml"
+	layoutPath := filepath.Join(configDir, "BeautyPatch", filename)
 
-	file, err := os.Create(xmlPath)
+	xmlDirPath := filepath.Dir(layoutPath)
+	if _, err := os.Stat(xmlDirPath); os.IsNotExist(err) {
+		err := os.MkdirAll(xmlDirPath, os.ModePerm)
+		if err != nil {
+			logrus.Fatalf("Failed to create Taskbar.xml directory: %v", err)
+		}
+	}
+
+	file, err := os.Create(layoutPath)
 	if err != nil {
 		logger.Errorf("Failed to create file: %s", err.Error())
 		return
@@ -105,4 +113,12 @@ func main() {
 	}
 
 	logger.Infof("LayoutModificationTemplate written to Taskbar.xml file")
+
+	mountPath := "c:\\"
+	cmd := exec.Command("powershell", "-Command", fmt.Sprintf("Import-StartLayout -LayoutPath %s -MountPath %s", layoutPath, mountPath))
+
+	err = cmd.Run()
+	if err != nil {
+		fmt.Println(err)
+	}
 }
