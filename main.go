@@ -25,7 +25,7 @@ func main() {
 	}
 
 	// Create the log file directory if it doesn't exist
-	logFilePath := "C:\\ProgramData\\Streambox\\Beautypatch\\log\\run.log"
+	logFilePath := "C:\\ProgramData\\Streambox\\Beautypatch\\log\\run-log.txt"
 	logDirPath := filepath.Dir(logFilePath)
 	if _, err := os.Stat(logDirPath); os.IsNotExist(err) {
 		err := os.MkdirAll(logDirPath, os.ModePerm)
