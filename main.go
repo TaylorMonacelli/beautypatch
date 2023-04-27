@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/sirupsen/logrus"
 )
@@ -38,17 +39,25 @@ func main() {
 	var taskbarApps string
 	for _, path := range paths {
 		if _, err := os.Stat(path); err == nil {
-			logger.Infof("File exists: %s", path)
-			taskbarApps += "        <taskbar:DesktopApp DesktopApplicationLinkPath=\"" + path + "\" />\n"
+			logger.Infof("Path exists: %s", path)
 		} else {
-			logger.Warnf("File does not exist: %s", path)
+			logger.Warnf("Path does not exist, but adding it to : %s", path)
 		}
+		taskbarApps += "        <taskbar:DesktopApp DesktopApplicationLinkPath=\"" + path + "\" />\n"
 	}
 
 	xmlContent := []byte(fmt.Sprintf(xmlTemplate, taskbarApps))
 
 	// Write to file
-	file, err := os.Create("Taskbar.xml")
+	wd, err := os.Getwd()
+	if err != nil {
+		fmt.Println("Error getting working directory:", err)
+		return
+	}
+
+	xmlPath := filepath.Join(wd, "Taskbar.xml")
+
+	file, err := os.Create(xmlPath)
 	if err != nil {
 		logger.Errorf("Failed to create file: %s", err.Error())
 		return
