@@ -53,6 +53,8 @@ func main() {
 	  </CustomTaskbarLayoutCollection>
 	</LayoutModificationTemplate>`, taskbarPinList)
 
+	fmt.Println(layoutModificationTemplate)
+
 	// log the layout modification template
 	logger.Infof("Layout modification template:\n%s", layoutModificationTemplate)
 }
