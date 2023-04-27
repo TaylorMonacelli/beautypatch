@@ -40,6 +40,10 @@ func main() {
 			}).Info("File exists")
 
 			xmlTemplate = fmt.Sprintf("%s\n<taskbar:DesktopApp DesktopApplicationLinkPath=\"%s\" />", xmlTemplate, path)
+
+			docStartIndex := len(xmlTemplate) - len("</taskbar:TaskbarPinList>\n      </defaultlayout:TaskbarLayout>\n    </CustomTaskbarLayoutCollection>\n  </LayoutModificationTemplate>")
+			xmlTemplate = xmlTemplate[:docStartIndex] + fmt.Sprintf("\n<taskbar:DesktopApp DesktopApplicationLinkPath=\"%s\" />", path) + xmlTemplate[docStartIndex:]
+
 			log.WithFields(log.Fields{
 				"path": path,
 			}).Info("Path added to XML template")
