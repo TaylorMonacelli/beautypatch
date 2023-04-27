@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"time"
 
 	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
@@ -116,9 +117,13 @@ func main() {
 
 	mountPath := "c:\\"
 	cmd := exec.Command("powershell", "-Command", fmt.Sprintf("Import-StartLayout -LayoutPath %s -MountPath %s", layoutPath, mountPath))
+	logger.Infof("LayoutModificationTemplate written to Taskbar.xml file")
+
+	// Log the command as a string
+	logrus.Infof("Running command: %s", strings.Join(cmd.Args, " "))
 
 	err = cmd.Run()
 	if err != nil {
-		fmt.Println(err)
+		logrus.WithError(err).Error("Failed to import StartLayout")
 	}
 }
