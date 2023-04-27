@@ -16,7 +16,6 @@ func main() {
 		"%appdata%\\Microsoft\\Windows\\Start Menu\\Programs\\System Tools\\Command Prompt.lnk",
 		"C:\\Program Files\\Microsoft VS Code\\code.exe",
 		"C:\\Program Files\\PowerShell\\7\\pwsh.exe",
-		"C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Wireshark.lnk",
 		"C:\\Windows\\System32\\control.exe",
 		"C:\\Windows\\System32\\windowspowershell\\v1.0\\powershell.exe",
 		"C:\\Windows\\System32\\windowspowershell\\v1.0\\powershell.lnk",
