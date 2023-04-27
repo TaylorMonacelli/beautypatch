@@ -33,8 +33,7 @@ func main() {
 		logFilePath+".%Y%m%d%H%M%S",
 		rotatelogs.WithLinkName(logFilePath),
 		rotatelogs.WithRotationTime(time.Hour),
-		rotatelogs.WithMaxAge(time.Hour*24*7),
-		rotatelogs.WithRotationSize(1000),
+		rotatelogs.WithMaxAge(time.Minute*1),
 	)
 	if err != nil {
 		logrus.Fatalf("Failed to create RotateLogs object: %v", err)
