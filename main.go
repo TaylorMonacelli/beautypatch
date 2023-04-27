@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
+	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
 	"github.com/sirupsen/logrus"
 )
 
@@ -26,14 +28,25 @@ func main() {
 		}
 	}
 
+	// Create a RotateLogs object
+	rotateLogs, err := rotatelogs.New(
+		logFilePath+".%Y%m%d%H%M%S",
+		rotatelogs.WithLinkName(logFilePath),
+		rotatelogs.WithRotationTime(time.Hour),
+		rotatelogs.WithMaxAge(time.Hour*24*7),
+		rotatelogs.WithRotationSize(1024*1024),
+	)
+	if err != nil {
+		logrus.Fatalf("Failed to create RotateLogs object: %v", err)
+	}
+
 	// Initialize logrus
 	// Create the logger and set the output to the log file
 	logger := logrus.New()
-	logFile, err := os.OpenFile(logFilePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
 	if err != nil {
 		logrus.Fatalf("Failed to open log file: %v", err)
 	}
-	logger.SetOutput(logFile)
+	logger.SetOutput(rotateLogs)
 
 	// Log a message
 	logger.Info("Logging to file and stdout")
