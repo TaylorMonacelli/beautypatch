@@ -1,10 +1,7 @@
 package main
 
 import (
-	"fmt"
 	"os"
-	"path/filepath"
-
 	"github.com/sirupsen/logrus"
 )
 
@@ -15,46 +12,50 @@ func main() {
 		"C:\\Windows\\explorer.exe",
 	}
 
-	// create a new logger instance
+	// Initialize logrus
 	logger := logrus.New()
-
-	// set logger output to stdout
 	logger.SetOutput(os.Stdout)
 
-	// create a new taskbar pin list
-	taskbarPinList := ""
+	xmlTemplate := `<?xml version="1.0" encoding="utf-8"?>
+<LayoutModificationTemplate
+    xmlns="http://schemas.microsoft.com/Start/2014/LayoutModification"
+    xmlns:defaultlayout="http://schemas.microsoft.com/Start/2014/FullDefaultLayout"
+    xmlns:start="http://schemas.microsoft.com/Start/2014/StartLayout"
+    xmlns:taskbar="http://schemas.microsoft.com/Start/2014/TaskbarLayout"
+    Version="1">
+  <CustomTaskbarLayoutCollection PinListPlacement="Replace">
+    <defaultlayout:TaskbarLayout>
+      <taskbar:TaskbarPinList>
+%s
+      </taskbar:TaskbarPinList>
+    </defaultlayout:TaskbarLayout>
+  </CustomTaskbarLayoutCollection>
+</LayoutModificationTemplate>`
 
-	// iterate over paths
+	var taskbarApps string
 	for _, path := range paths {
-		// check if the file exists
-		if _, err := os.Stat(path); os.IsNotExist(err) {
-			logger.Warnf("%s does not exist", path)
-			continue
+		if _, err := os.Stat(path); err == nil {
+			logger.Infof("File exists: %s", path)
+			taskbarApps += "        <taskbar:DesktopApp DesktopApplicationLinkPath=\"" + path + "\" />\n"
+		} else {
+			logger.Warnf("File does not exist: %s", path)
 		}
-
-		// add the path to the taskbar pin list
-		taskbarPinList += fmt.Sprintf(`<taskbar:DesktopApp DesktopApplicationLinkPath="%s" />\n`, filepath.ToSlash(path))
-		logger.Infof("%s added to the taskbar pin list", path)
 	}
 
-	// create the layout modification template
-	layoutModificationTemplate := fmt.Sprintf(`<?xml version="1.0" encoding="utf-8"?>
-	<LayoutModificationTemplate xmlns="http://schemas.microsoft.com/Start/2014/LayoutModification"
-	    xmlns:defaultlayout="http://schemas.microsoft.com/Start/2014/FullDefaultLayout"
-	    xmlns:start="http://schemas.microsoft.com/Start/2014/StartLayout"
-	    xmlns:taskbar="http://schemas.microsoft.com/Start/2014/TaskbarLayout"
-	    Version="1">
-	  <CustomTaskbarLayoutCollection PinListPlacement="Replace">
-	    <defaultlayout:TaskbarLayout>
-	      <taskbar:TaskbarPinList>
-	        %s
-	      </taskbar:TaskbarPinList>
-	    </defaultlayout:TaskbarLayout>
-	  </CustomTaskbarLayoutCollection>
-	</LayoutModificationTemplate>`, taskbarPinList)
+	xmlContent := []byte(fmt.Sprintf(xmlTemplate, taskbarApps))
 
-	fmt.Println(layoutModificationTemplate)
+	// Write to file
+	file, err := os.Create("Taskbar.xml")
+	if err != nil {
+		logger.Errorf("Failed to create file: %s", err.Error())
+		return
+	}
+	defer file.Close()
 
-	// log the layout modification template
-	logger.Infof("Layout modification template:\n%s", layoutModificationTemplate)
+	if _, err := file.Write(xmlContent); err != nil {
+		logger.Errorf("Failed to write to file: %s", err.Error())
+		return
+	}
+
+	logger.Infof("LayoutModificationTemplate written to Taskbar.xml file")
 }
